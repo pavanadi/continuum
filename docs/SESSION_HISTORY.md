@@ -261,3 +261,7 @@ This is the append-only record of **coding work and decisions** for handoff betw
 - **Checks:** Scanned files that would be committed for API-key patterns, emails, account identifiers, and absolute local paths. Nothing found except in `tools/demo-video/capture.mjs` (absolute `file:///Users/...` path). That folder is the video agent's in-progress work and was left untracked. `.env`, `.continuum/`, and `exports/` confirmed ignored. `npm test` passed 67/67.
 - **Credit impact:** None (no provider calls).
 - **Remaining:** Commit `tools/demo-video/` after the path fix; create the GitHub remote and push when the user approves.
+
+## 2026-09-25 — Video tooling excluded from Git (Claude Code)
+
+- **Decision:** The user chose to keep the demo-video tooling out of the repository. Added `tools/demo-video/` to `.gitignore`. The files stay on disk for the video agent. This also keeps the absolute local path in `capture.mjs` out of the public repo.

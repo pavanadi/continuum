@@ -25,7 +25,7 @@ Nimble 77 attempts, ~$0.0796 list estimate (1 unknown-cost timeout; balance unkn
 3. **Rehearse `docs/DEMO_SCRIPT.md`** (written and dry-run 2026-09-25; offline fallback export at `exports/small-models-v1-run-1.json`).
 3. Optional quality: a Phi-4-mini official-source search (support query gets no entity-filtered results), Llama context/params (no admissible evidence), and `ask` entailment beyond attribution.
 4. Operator reconciliation for unmatched starts and crash gaps (NEXT_STEPS §2).
-5. **Git:** `tools/demo-video/` (video agent, in progress) is untracked and not committed. Before committing it, replace the absolute `file:///Users/...` path in `capture.mjs` with a repo-relative one. Then create the GitHub repo and push when the user approves.
+5. **Git:** `tools/demo-video/` (video tooling) is git-ignored by user choice, like `exports/`. Create the GitHub repo and push when the user approves.
 
 ## Known limits
 
