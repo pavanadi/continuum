@@ -269,3 +269,9 @@ This is the append-only record of **coding work and decisions** for handoff betw
 ## 2026-09-25 — Pushed to GitHub (Claude Code)
 
 - **Activity:** With the user's approval, logged the GitHub CLI in as `pavanadi` using browser device login. Created the public repository https://github.com/pavanadi/continuum and pushed `main` (commits `e8bba61`, `3d11067`). `exports/`, `tools/demo-video/`, `.continuum/`, and `.env` stay ignored and were not pushed.
+
+## 2026-09-25 — Judge Q&A prep sheet (Claude Code)
+
+- **Activity:** Added `docs/JUDGE_QA.md`: a 20-second answer, key numbers, a four-line architecture summary, likely questions by topic with answers, weak spots, phrases to avoid, and live-check commands. It complements `docs/DEMO_SCRIPT.md`.
+- **Evidence:** Numbers were computed from `exports/small-models-v1-run-1.json`: 20 claims; 72 tasks; 9 sessions; 74 revisions; 40 observations from 18 hosts, 16 of them full-page; ✓7 ◐1 ⚠1 ?11; two logged failures, each retried. The reasons for each non-supported claim were read from the stored decisions. CURRENT_HANDOFF still says "66 tasks, 6 sessions, 66/66 tests"; the export and today's test run show 72 / 9 / 67.
+- **Credit impact:** None (local reads only).
