@@ -1,0 +1,18 @@
+{
+  "name": "continuum",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "demo": "node src/demo.ts",
+    "demo:rawtree": "node --env-file-if-exists=.env src/rawtree-demo.ts",
+    "demo:liquid": "node --env-file-if-exists=.env src/liquid-demo.ts",
+    "demo:live": "node --env-file-if-exists=.env src/live-demo.ts",
+    "credits": "node --env-file-if-exists=.env src/credits.ts",
+    "test": "node --test tests/*.test.ts",
+    "inspector": "node --env-file-if-exists=.env src/inspector/server.ts",
+    "brief": "node --env-file-if-exists=.env src/brief/cli.ts"
+  },
+  "engines": {
+    "node": ">=22.18"
+  }
+}

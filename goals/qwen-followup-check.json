@@ -1,0 +1,6 @@
+{
+  "id": "qwen-followup-check",
+  "goal": "Validation: resolve the Qwen3-4B context-length disagreement (32K vs 128K) with a contradiction-driven follow-up.",
+  "entities": ["Qwen3-4B"],
+  "attributes": ["context length"]
+}

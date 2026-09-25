@@ -1,0 +1,6 @@
+{
+  "id": "page-fetch-check",
+  "goal": "Validation: recover context length for the two pilot models whose search snippets had no values, using full-page fallback.",
+  "entities": ["Gemma-3-4B", "Phi-4-mini"],
+  "attributes": ["context length"]
+}

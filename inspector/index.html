@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Continuum Inspector</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --panel: #ffffff; --ink: #1d1d1b; --muted: #6b6b66; --line: #e3e2dd; --accent: #3b5bdb;
+    --ok: #2f7d4f; --ok-bg: #e6f4ec; --qual: #1c6f8c; --qual-bg: #e2f1f7; --warn: #a3600a; --warn-bg: #fdf1dc;
+    --none: #6b6b66; --none-bg: #efeeea; --pend: #8a8a84; --pend-bg: #f4f4f1; --bad: #b42318; --bad-bg: #fdecea;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151514; --panel: #1e1e1c; --ink: #ecebe6; --muted: #a09f98; --line: #34332f; --accent: #8ea4ff;
+      --ok: #7fd3a0; --ok-bg: #1d3327; --qual: #7cc8e3; --qual-bg: #17303a; --warn: #f2b45c; --warn-bg: #3a2c14;
+      --none: #b5b4ad; --none-bg: #2a2a27; --pend: #8f8e88; --pend-bg: #232321; --bad: #ff8a80; --bad-bg: #3b1d1a;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 12px 20px; border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 2; }
+  header h1 { font-size: 16px; margin: 0 12px 0 0; }
+  header .spacer { flex: 1; }
+  select, button, input[type=text] { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; }
+  button { cursor: pointer; }
+  button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  button:disabled { opacity: .5; cursor: default; }
+  main { padding: 16px 20px 40px; max-width: 1400px; margin: 0 auto; }
+  .summary { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baseline; margin-bottom: 14px; }
+  .goal { font-size: 15px; flex-basis: 100%; }
+  .meta { color: var(--muted); font-size: 13px; }
+  .chip { display: inline-flex; gap: 6px; align-items: center; padding: 2px 10px; border-radius: 999px; font-size: 13px; font-weight: 500; }
+  .s-supported { color: var(--ok); background: var(--ok-bg); } .s-qualified { color: var(--qual); background: var(--qual-bg); }
+  .s-unresolved { color: var(--warn); background: var(--warn-bg); } .s-insufficient { color: var(--none); background: var(--none-bg); }
+  .s-pending { color: var(--pend); background: var(--pend-bg); }
+  .grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; min-width: 0; }
+  .panel h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 10px; }
+  .matrix-wrap { overflow-x: auto; }
+  table.matrix { border-collapse: separate; border-spacing: 4px; width: 100%; }
+  .matrix th { text-align: left; font-size: 12px; color: var(--muted); font-weight: 500; padding: 2px 6px; white-space: nowrap; }
+  .matrix th.row { color: var(--ink); font-weight: 600; font-size: 13px; }
+  .cell { width: 100%; text-align: left; border: 1px solid transparent; border-radius: 8px; padding: 8px 10px; min-height: 52px; display: block; }
+  .cell:hover { border-color: var(--line); }
+  .cell.selected { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .cell .st { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; opacity: .85; }
+  .cell .val { display: block; color: var(--ink); font-size: 13px; overflow-wrap: anywhere; }
+  .legend { margin-top: 10px; font-size: 12px; color: var(--muted); }
+  .detail h3 { margin: 0 0 4px; font-size: 16px; }
+  .reason { margin: 8px 0 12px; }
+  .section { margin-top: 14px; }
+  .section h4 { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 6px; }
+  .ev { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; }
+  .ev .v { font-weight: 600; }
+  .ev blockquote { margin: 6px 0; padding: 4px 10px; border-left: 3px solid var(--line); color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13px; }
+  .ev .m, .dec .m { font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+  .tag { font-size: 11px; padding: 1px 6px; border-radius: 4px; background: var(--pend-bg); color: var(--muted); margin-left: 6px; }
+  .dec { padding: 6px 0; border-top: 1px dashed var(--line); }
+  .dec.old { opacity: .65; }
+  a { color: var(--accent); }
+  .tabs { display: flex; gap: 4px; margin: 18px 0 0; }
+  .tabs button { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+  .tabs button[aria-selected=true] { background: var(--panel); border-bottom-color: var(--panel); font-weight: 600; }
+  .tabpanel { border-top-left-radius: 0; }
+  ul.plain { list-style: none; padding: 0; margin: 0; }
+  .finding { padding: 6px 0; border-bottom: 1px solid var(--line); }
+  .finding .k { font-family: var(--mono); font-size: 12px; color: var(--warn); }
+  .tl { font-family: var(--mono); font-size: 12px; }
+  .tl li { padding: 2px 0; display: grid; grid-template-columns: 170px 60px 1fr; gap: 8px; }
+  .tl li.ckpt { color: var(--qual); }
+  .tl li.boundary { display: block; color: var(--muted); text-align: center; border-top: 1px dashed var(--line); margin: 6px 0; padding-top: 4px; }
+  .ask-row { display: flex; gap: 8px; }
+  .ask-row input { flex: 1; }
+  .answer { margin-top: 12px; }
+  .verdict { font-weight: 600; font-size: 13px; }
+  .verdict.ok { color: var(--ok); } .verdict.bad { color: var(--bad); }
+  .answer-text { margin: 8px 0; padding: 10px 12px; background: var(--bg); border-radius: 8px; white-space: pre-wrap; }
+  .empty { color: var(--muted); }
+  .error { color: var(--bad); background: var(--bad-bg); padding: 8px 12px; border-radius: 8px; margin-bottom: 12px; }
+  .examples button { font-size: 12px; margin: 6px 6px 0 0; padding: 3px 8px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Continuum Inspector</h1>
+  <select id="runs" aria-label="Run"></select>
+  <button id="reload" title="Rebuild from RawTree">Reload</button>
+  <span class="spacer"></span>
+  <label><button id="open-btn" type="button">Open JSON</button><input id="file" type="file" accept="application/json,.json" hidden></label>
+  <button id="brief" title="Open the generated evidence brief (npm run brief -- <run-id>)">Open brief</button>
+  <button id="export" title="Download this bundle as JSON">Export JSON</button>
+</header>
+<main>
+  <div id="error" class="error" hidden></div>
+  <div class="summary" id="summary"><span class="empty">Loading…</span></div>
+  <div class="grid">
+    <section class="panel"><h2>Claims</h2><div class="matrix-wrap" id="matrix"></div>
+      <div class="legend">✓ supported: two or more distinct hosts agree (not proof of truth) · ◐ qualified: values differ by a condition one source states · ⚠ unresolved: stored values disagree · ? insufficient: fewer than two hosts · … pending</div>
+    </section>
+    <section class="panel detail" id="detail"><span class="empty">Select a claim to see its decision, evidence, and tasks.</span></section>
+  </div>
+  <div class="tabs" role="tablist">
+    <button role="tab" data-tab="ask" aria-selected="true">Ask the memory</button>
+    <button role="tab" data-tab="findings" aria-selected="false">Findings</button>
+    <button role="tab" data-tab="timeline" aria-selected="false">Timeline</button>
+  </div>
+  <section class="panel tabpanel" id="tab-ask">
+    <div class="ask-row"><input id="question" type="text" maxlength="500" placeholder="Why did you conclude …?  What failed, and was it retried?"><button class="primary" id="ask">Ask</button></div>
+    <div class="examples" id="examples"></div>
+    <div class="answer" id="answer"></div>
+  </section>
+  <section class="panel tabpanel" id="tab-findings" hidden></section>
+  <section class="panel tabpanel" id="tab-timeline" hidden></section>
+</main>
+<script>
+'use strict';
+// All run content comes from web pages via the agent: render it as text only, never as HTML.
+const $ = id => document.getElementById(id);
+function h(tag, props = {}, ...children) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(props)) {
+    if (v === undefined || v === null || v === false) continue;
+    if (k === 'class') el.className = v; else if (k === 'text') el.textContent = v;
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2), v); else el.setAttribute(k, v);
+  }
+  for (const c of children.flat()) if (c !== null && c !== undefined && c !== false) el.append(c instanceof Node ? c : String(c));
+  return el;
+}
+const safeLink = (url, label) => { try { const u = new URL(url); if (u.protocol === 'http:' || u.protocol === 'https:') return h('a', { href: u.href, target: '_blank', rel: 'noopener noreferrer', text: label ?? u.hostname }); } catch {} return h('span', { text: label ?? url }); };
+const ICON = { supported: '✓', qualified: '◐', unresolved: '⚠', insufficient: '?', pending: '…' };
+const state = { bundle: null, selected: null, offline: false };
+
+function cellLabel(c) {
+  if (c.status === 'supported') return c.value;
+  if (c.status === 'qualified') return c.groups.map(g => g.label).join(' / ');
+  if (c.status === 'unresolved') return c.groups.map(g => g.label).join(' vs ');
+  const voting = c.evidence.filter(e => (c.voting ?? []).includes(e.id));
+  if (c.status === 'insufficient') return voting.length ? `${voting[0].value} (1 host)` : 'no admissible evidence';
+  return 'pending';
+}
+
+function showError(message) { const el = $('error'); el.hidden = !message; el.textContent = message ?? ''; }
+
+async function api(path, options) {
+  const response = await fetch(path, options);
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error ?? `HTTP ${response.status}`);
+  return data;
+}
+
+function renderSummary(b) {
+  const s = $('summary'); s.replaceChildren();
+  s.append(h('div', { class: 'goal', text: b.goal ?? '(no checkpoint)' }),
+    h('span', { class: 'meta', text: `run ${b.runId} · revision ${b.latestRevision} · ${b.sessions.length} session(s) · ${b.pending.length} pending task(s) · built ${new Date(b.generatedAt).toLocaleString()}${state.offline ? ' · offline file' : ''}` }),
+    ...['supported', 'qualified', 'unresolved', 'insufficient', 'pending'].filter(k => b.totals[k])
+      .map(k => h('span', { class: `chip s-${k}`, text: `${ICON[k]} ${b.totals[k]} ${k}` })));
+  if (b.truncated.checkpoints || b.truncated.flight) s.append(h('span', { class: 'chip s-unresolved', text: 'history truncated' }));
+}
+
+function renderMatrix(b) {
+  const table = h('table', { class: 'matrix' });
+  table.append(h('tr', {}, h('th', { text: '' }), b.attributes.map(a => h('th', { text: a }))));
+  for (const entity of b.entities) {
+    table.append(h('tr', {}, h('th', { class: 'row', text: entity }), b.attributes.map(attribute => {
+      const c = b.claims.find(x => x.entity === entity && x.attribute === attribute);
+      if (!c) return h('td', {});
+      return h('td', {}, h('button', { class: `cell s-${c.status}${state.selected === c.claimKey ? ' selected' : ''}`, title: c.claimKey,
+        onclick: () => { state.selected = c.claimKey; renderMatrix(b); renderDetail(c); } },
+        h('span', { class: 'st', text: `${ICON[c.status]} ${c.status}` }), h('span', { class: 'val', text: cellLabel(c) })));
+    })));
+  }
+  $('matrix').replaceChildren(table);
+}
+
+function renderDetail(c) {
+  const d = $('detail'); d.replaceChildren();
+  const latest = c.decisions.at(-1);
+  d.append(h('h3', { text: c.claimKey }), h('span', { class: `chip s-${c.status}`, text: `${ICON[c.status]} ${c.status}${c.value ? ` = ${c.value}` : ''}` }));
+  if (latest) d.append(h('p', { class: 'reason', text: latest.reason }));
+  if (c.decisions.length > 1) {
+    d.append(h('div', { class: 'section' }, h('h4', { text: 'Decision history (append-only)' }),
+      c.decisions.map((x, i) => h('div', { class: `dec${i < c.decisions.length - 1 ? ' old' : ''}` },
+        h('div', { text: `${ICON[x.status] ?? ''} ${x.status}${x.value ? ` = ${x.value}` : ''}${i < c.decisions.length - 1 ? ' (earlier)' : ' (latest)'}` }),
+        h('div', { class: 'm', text: `revision ${x.revision ?? '?'} · ${x.reason}` })))));
+  }
+  d.append(h('div', { class: 'section' }, h('h4', { text: `Evidence (${c.evidence.length}) · hosts: ${c.hosts.join(', ') || 'none'}` }),
+    c.evidence.length ? c.evidence.map(e => h('div', { class: 'ev' },
+      h('div', {}, h('span', { class: 'v', text: e.value }), h('span', { class: 'tag', text: e.via }),
+        (c.voting ?? []).includes(e.id) ? null : h('span', { class: 'tag', text: 'excluded by current rules' })),
+      e.quote ? h('blockquote', { text: e.quote }) : null,
+      h('div', { class: 'm' }, safeLink(e.sourceUrl, e.host), ` · observed ${e.observedAt}`,
+        e.extraction ? ` · extracted by ${e.extraction.model} (${e.extraction.provider}, ${e.extraction.promptVersion})` : '',
+        ` · id ${e.id.slice(0, 12)}…`))) : h('div', { class: 'empty', text: 'No evidence stored for this claim.' })));
+  d.append(h('div', { class: 'section' }, h('h4', { text: 'Tasks' }), h('ul', { class: 'plain' },
+    c.tasks.map(t => h('li', { class: 'm', text: `${t.status === 'completed' ? '✓' : '·'} ${t.id} ${t.role} · attempts ${t.attempts}${t.completedAtRevision ? ` · completed at r${t.completedAtRevision}` : ''}${t.lastFlightType ? ` · last ${t.lastFlightType}` : ''}` })))));
+  const ask = h('button', { text: `Ask why about ${c.entity}`, onclick: () => {
+    $('question').value = c.status === 'unresolved' ? `Why is the ${c.claimKey.replace(' | ', ' ')} unresolved?` : `Why did you conclude the ${c.claimKey.replace(' | ', ' ')}?`;
+    selectTab('ask'); runAsk(); } });
+  ask.disabled = state.offline;
+  d.append(h('div', { class: 'section' }, ask));
+}
+
+function renderFindings(b) {
+  const el = $('tab-findings'); el.replaceChildren(h('h2', { text: `Findings needing attention (${b.findings.length})` }));
+  if (!b.findings.length) return el.append(h('div', { class: 'empty', text: 'None.' }));
+  el.append(h('ul', { class: 'plain' }, b.findings.map(f => h('li', { class: 'finding' },
+    h('span', { class: 'k', text: f.kind }), ` ${f.taskId || '(run)'}: ${f.detail}`))));
+}
+
+function renderTimeline(b) {
+  const el = $('tab-timeline'); el.replaceChildren(h('h2', { text: `Timeline (${b.timeline.length} entries)` }));
+  const list = h('ul', { class: 'plain tl' });
+  let session = 0;
+  for (const e of b.timeline) {
+    if (e.session && e.session > session) { if (session) list.append(h('li', { class: 'boundary', text: '── restart boundary: new process session ──' })); session = e.session; }
+    list.append(h('li', { class: e.source === 'checkpoint' ? 'ckpt' : '' }, h('span', { text: e.at }),
+      h('span', { text: e.source === 'checkpoint' ? 'CKPT' : `S${e.session ?? '?'}` }), h('span', { text: `${e.taskId ? e.taskId + ' ' : ''}${e.label}` })));
+  }
+  el.append(list);
+}
+
+function renderExamples(b) {
+  const unresolved = b.claims.find(c => c.status === 'unresolved' || c.status === 'qualified');
+  const supported = b.claims.find(c => c.status === 'supported');
+  const qs = [supported && `Why did you conclude the ${supported.claimKey.replace(' | ', ' ')} is ${supported.value}?`,
+    unresolved && `Why is the ${unresolved.claimKey.replace(' | ', ' ')} ${unresolved.status}?`,
+    'What failed during this run, and was it retried?'].filter(Boolean);
+  $('examples').replaceChildren(...qs.map(q => h('button', { text: q, disabled: state.offline, onclick: () => { $('question').value = q; runAsk(); } })));
+}
+
+function render(b) {
+  state.bundle = b;
+  renderSummary(b); renderMatrix(b); renderFindings(b); renderTimeline(b); renderExamples(b);
+  const selected = b.claims.find(c => c.claimKey === state.selected) ?? b.claims.find(c => c.status === 'unresolved' || c.status === 'qualified') ?? b.claims[0];
+  if (selected) { state.selected = selected.claimKey; renderMatrix(b); renderDetail(selected); }
+  $('ask').disabled = state.offline; $('question').disabled = state.offline;
+  if (state.offline) $('answer').replaceChildren(h('div', { class: 'empty', text: 'Ask needs the live inspector server (npm run inspector); offline JSON files are read-only.' }));
+}
+
+async function runAsk() {
+  const question = $('question').value.trim();
+  if (!question || !state.bundle || state.offline) return;
+  const out = $('answer'); out.replaceChildren(h('div', { class: 'empty', text: 'Retrieving from RawTree and asking Liquid…' }));
+  $('ask').disabled = true;
+  try {
+    const r = await api('/api/ask', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ runId: state.bundle.runId, question }) });
+    const a = r.answer;
+    const scope = `${r.packet.claims.length} claim(s) ${r.scope === 'matched' ? 'matched' : '(all)'} · ${r.intent} question · model ${a.model ?? '?'}`;
+    out.replaceChildren(h('div', { class: 'meta', text: scope }));
+    if (a.status === 'verified') {
+      out.append(h('div', { class: 'verdict ok', text: `✓ Verified: ${a.citations.length} citation(s) exist in stored records; all numbers grounded` }),
+        h('div', { class: 'answer-text', text: a.answer }), h('h4', { text: 'Citations' }),
+        h('ul', { class: 'plain' }, a.citations.map(c => h('li', { class: 'ev' }, h('span', { class: 'tag', text: `${c.alias} · ${c.kind}` }), ' ', c.text))));
+    } else {
+      out.append(h('div', { class: 'verdict bad', text: `✗ Answer withheld: ${a.problems.join('; ')}` }), h('h4', { text: 'Stored records for this question' }),
+        h('ul', { class: 'plain' }, r.packet.claims.map(c => h('li', { class: 'ev' },
+          h('div', { class: 'v', text: `${c.claim}: ${c.decision ? c.decision.status + ' — ' + c.decision.reason : 'no decision yet'}` }),
+          c.evidence.map(e => h('div', { class: 'm' }, `[${e.alias}] ${e.value} — `, safeLink(e.url, e.host), ` (${e.via})`))))));
+    }
+    out.append(h('div', { class: 'legend', text: 'Verification checks that citations and numbers come from stored records. It does not prove the reasoning between them; read the citations.' }));
+  } catch (error) { out.replaceChildren(h('div', { class: 'error', text: `Ask failed: ${error.message}` })); }
+  finally { $('ask').disabled = false; }
+}
+
+function selectTab(name) {
+  for (const b of document.querySelectorAll('[role=tab]')) b.setAttribute('aria-selected', String(b.dataset.tab === name));
+  for (const t of ['ask', 'findings', 'timeline']) $(`tab-${t}`).hidden = t !== name;
+}
+
+async function loadRun(runId) {
+  showError(null); state.offline = false;
+  $('summary').replaceChildren(h('span', { class: 'empty', text: `Building ${runId} from RawTree…` }));
+  try { render(await api(`/api/runs/${encodeURIComponent(runId)}`)); history.replaceState(null, '', `?run=${encodeURIComponent(runId)}`); }
+  catch (error) { showError(`Could not load ${runId}: ${error.message}`); }
+}
+
+async function init() {
+  for (const b of document.querySelectorAll('[role=tab]')) b.addEventListener('click', () => selectTab(b.dataset.tab));
+  $('ask').addEventListener('click', runAsk);
+  $('question').addEventListener('keydown', e => { if (e.key === 'Enter') runAsk(); });
+  $('reload').addEventListener('click', () => $('runs').value && loadRun($('runs').value));
+  $('runs').addEventListener('change', () => loadRun($('runs').value));
+  $('open-btn').addEventListener('click', () => $('file').click());
+  $('file').addEventListener('change', async () => {
+    const file = $('file').files[0]; if (!file) return;
+    try {
+      const b = JSON.parse(await file.text());
+      if (b.schema !== 'continuum-inspector-v1') throw new Error('not a Continuum inspector export');
+      showError(null); state.offline = true; state.selected = null; render(b);
+    } catch (error) { showError(`Could not open ${file.name}: ${error.message}`); }
+  });
+  $('brief').addEventListener('click', () => { if (state.bundle) window.open(`/briefs/${encodeURIComponent(state.bundle.runId)}-brief.html`, '_blank', 'noopener'); });
+  $('export').addEventListener('click', () => {
+    if (!state.bundle) return;
+    const url = URL.createObjectURL(new Blob([JSON.stringify(state.bundle, null, 2)], { type: 'application/json' }));
+    h('a', { href: url, download: `${state.bundle.runId}.json` }).click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+  if (location.protocol === 'file:') {
+    state.offline = true; $('reload').disabled = true; $('runs').disabled = true;
+    $('summary').replaceChildren(h('span', { class: 'empty', text: 'Offline mode: use "Open JSON" to load an export (npm run inspector -- export <run-id>).' }));
+    return;
+  }
+  try {
+    const runs = await api('/api/runs');
+    $('runs').replaceChildren(...runs.map(r => h('option', { value: r.runId, text: `${r.runId} (r${r.revision})` })));
+    const wanted = new URLSearchParams(location.search).get('run');
+    const first = runs.find(r => r.runId === wanted) ?? runs[0];
+    if (first) { $('runs').value = first.runId; await loadRun(first.runId); }
+    else $('summary').replaceChildren(h('span', { class: 'empty', text: 'No runs stored in RawTree yet.' }));
+  } catch (error) { showError(`Could not list runs: ${error.message}`); }
+}
+init();
+</script>
+</body>
+</html>

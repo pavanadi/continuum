@@ -1,0 +1,6 @@
+{
+  "id": "small-models-v1",
+  "goal": "Choose a small open-weight language model (about 2-4B parameters) to run on our own devices. Compare the candidates on context length, parameter count, license, and release date, citing sources and preserving disagreements.",
+  "entities": ["LFM2.5-2.6B", "Gemma-3-4B", "Qwen3-4B", "Phi-4-mini", "Llama-3.2-3B"],
+  "attributes": ["context length", "parameter count", "license", "release date"]
+}

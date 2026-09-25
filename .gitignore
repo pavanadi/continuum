@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+.continuum/
+node_modules/
+exports/
+.DS_Store
+*.log
+tools/demo-video/*.aiff
+tools/demo-video/*.png
+tools/demo-video/layout.json
+tools/demo-video/timeline.json
+tools/demo-video/video-only.mp4
+tools/demo-video/render
+tools/demo-video/chrome-profile/
