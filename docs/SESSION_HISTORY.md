@@ -265,3 +265,7 @@ This is the append-only record of **coding work and decisions** for handoff betw
 ## 2026-09-25 — Video tooling excluded from Git (Claude Code)
 
 - **Decision:** The user chose to keep the demo-video tooling out of the repository. Added `tools/demo-video/` to `.gitignore`. The files stay on disk for the video agent. This also keeps the absolute local path in `capture.mjs` out of the public repo.
+
+## 2026-09-25 — Pushed to GitHub (Claude Code)
+
+- **Activity:** With the user's approval, logged the GitHub CLI in as `pavanadi` using browser device login. Created the public repository https://github.com/pavanadi/continuum and pushed `main` (commits `e8bba61`, `3d11067`). `exports/`, `tools/demo-video/`, `.continuum/`, and `.env` stay ignored and were not pushed.

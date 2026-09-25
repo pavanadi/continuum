@@ -25,8 +25,8 @@ Nimble 77 attempts, ~$0.0796 list estimate (1 unknown-cost timeout; balance unkn
 3. **Rehearse `docs/DEMO_SCRIPT.md`** (written and dry-run 2026-09-25; offline fallback export at `exports/small-models-v1-run-1.json`).
 3. Optional quality: a Phi-4-mini official-source search (support query gets no entity-filtered results), Llama context/params (no admissible evidence), and `ask` entailment beyond attribution.
 4. Operator reconciliation for unmatched starts and crash gaps (NEXT_STEPS §2).
-5. **Git:** `tools/demo-video/` (video tooling) is git-ignored by user choice, like `exports/`. Create the GitHub repo and push when the user approves.
+5. **Git:** `tools/demo-video/` (video tooling) is git-ignored by user choice, like `exports/`. Commit and push further changes to `origin/main`.
 
 ## Known limits
 
-One writer per run; no exactly-once external calls. Verified answers can overstate a cited source (not entailment-checked). Type-gate and variant rules are heuristics for model-spec attributes. Recorded decisions are never rewritten (use `reverify`). The workspace is a local Git repository (`main`, initialised 2026-09-25, not yet pushed; intended as a public MIT-licensed GitHub repo). `.env`, `.continuum/`, and `exports/` are ignored.
+One writer per run; no exactly-once external calls. Verified answers can overstate a cited source (not entailment-checked). Type-gate and variant rules are heuristics for model-spec attributes. Recorded decisions are never rewritten (use `reverify`). The workspace is a local Git repository (`main`, public and MIT-licensed at https://github.com/pavanadi/continuum, pushed 2026-09-25). `.env`, `.continuum/`, and `exports/` are ignored.
