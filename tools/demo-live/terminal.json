@@ -1,0 +1,25 @@
+{
+ "run": "acme-demo-9989",
+ "steps": [
+  {
+   "cmd": "npm run -s demo:rawtree -- acme-demo-9989 | grep -A3 nextTask",
+   "ms": 5098,
+   "output": "  \"nextTask\": {\n    \"id\": \"0:skeptic\",\n    \"role\": \"skeptic\",\n    \"claimKey\": \"acme:pricing\","
+  },
+  {
+   "cmd": "npm run -s demo:rawtree -- acme-demo-9989 | grep -A3 nextTask",
+   "ms": 5079,
+   "output": "  \"nextTask\": {\n    \"id\": \"0:verifier\",\n    \"role\": \"verifier\",\n    \"claimKey\": \"acme:pricing\","
+  },
+  {
+   "cmd": "npm run -s demo:rawtree -- acme-demo-9989 | grep -A3 nextTask",
+   "ms": 4982,
+   "output": "  \"nextTask\": null\n}"
+  },
+  {
+   "cmd": "npm run -s demo:rawtree -- acme-demo-9989 replay | tail -17 | cut -c1-118",
+   "ms": 1229,
+   "output": "  (none)\n\nTimeline (flight event order; checkpoints anchored to task completions, else by timestamp)\n  2026-09-25 23:46:30.365000000 CKPT revision 1: run created: Investigate fictional Acme pricing; task 0:researcher cr\n  2026-09-25 23:46:31.746000000 S1   0:researcher task started\n  2026-09-25 23:46:32.958000000 CKPT revision 2: task 0:researcher completed; evidence acme:pricing:support = \"$49/mon\n  2026-09-25 23:46:33.724000000 S1   0:researcher task completed\n  ── restart boundary: new process session ──\n  2026-09-25 23:46:35.748000000 S2   run resumed with 2 pending task(s)\n  2026-09-25 23:46:37.103000000 S2   0:skeptic task started\n  2026-09-25 23:46:37.608000000 CKPT revision 3: task 0:skeptic completed; evidence acme:pricing:challenge = \"$79/mont\n  2026-09-25 23:46:38.340000000 S2   0:skeptic task completed\n  ── restart boundary: new process session ──\n  2026-09-25 23:46:40.850000000 S3   run resumed with 1 pending task(s)\n  2026-09-25 23:46:42.109000000 S3   0:verifier task started\n  2026-09-25 23:46:43.017000000 CKPT revision 4: task 0:verifier completed; decision acme:pricing → unresolved; contra\n  2026-09-25 23:46:44.328000000 S3   0:verifier task completed"
+  }
+ ]
+}

@@ -174,3 +174,21 @@ test('standalone CLI resumes across processes through the HTTP adapter (fixture 
     assert.equal(replay.sessions.length, 3);
   } finally { await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve())); }
 });
+
+test('a read that briefly lags a confirmed write is re-read instead of failing; persistent staleness still fails', async () => {
+  const db = database();
+  const runner = new Orchestrator(new RawTreeMemory(db.transport, 'test-run'), fixtureResearch);
+  await runner.start('test-run', 'Pricing', ['price']);
+  // Simulate replica lag: the next two reads return nothing, then the committed checkpoint is visible.
+  const query = db.transport.query.bind(db.transport);
+  let lagging = 2;
+  db.transport.query = async sql => lagging-- > 0 ? [] : query(sql);
+  const state = await runner.step();
+  assert.equal(state.tasks[0].status, 'completed');
+  db.transport.query = async () => [];
+  const memory = new RawTreeMemory(db.transport, 'test-run');
+  (memory as unknown as { loaded: boolean; revision: number }).loaded = true;
+  (memory as unknown as { loaded: boolean; revision: number }).revision = 2;
+  (memory as unknown as { tableKnown: boolean }).tableKnown = true;
+  await assert.rejects(memory.load(), /stale state/);
+});

@@ -12,7 +12,7 @@ Updated 2026-09-25 (Claude Code). The short starting point for the next coding a
 
 ## Verification
 
-`npm test` passed **66/66** (fixtures only, no provider calls).
+`npm test` passed **68/68** (fixtures only, no provider calls).
 
 ## Credits (local ledger, UTC day 2026-09-25)
 
@@ -21,7 +21,7 @@ Nimble 77 attempts, ~$0.0796 list estimate (1 unknown-cost timeout; balance unkn
 ## Exact next steps
 
 1. **Human listen to both FLUX 3 clips** (audio: no speech). Frames were checked (draft: 1 frame; HD: 7 frames; no text).
-2. **Demo video:** `exports/demo/continuum-demo.mp4` (2:53, real page traversal, TTS narration, FLUX opener; rebuild with `tools/demo-video/make.sh`; see `docs/DEMO_VIDEO.md`). Listen once before sharing.
+2. **Videos** (see `docs/DEMO_VIDEO.md`): live demo `exports/demo/continuum-live-demo.mp4` (2:35; real inspector with live `ask` calls, captured terminal restart, Zoe (Premium) narration; rebuild with `tools/demo-live/make.sh` with the inspector running on current code) and pitch `exports/demo/continuum-pitch.mp4` (2:53). Listen to both once before sharing.
 3. **Rehearse `docs/DEMO_SCRIPT.md`** (written and dry-run 2026-09-25; offline fallback export at `exports/small-models-v1-run-1.json`).
 3. Optional quality: a Phi-4-mini official-source search (support query gets no entity-filtered results), Llama context/params (no admissible evidence), and `ask` entailment beyond attribution.
 4. Operator reconciliation for unmatched starts and crash gaps (NEXT_STEPS §2).

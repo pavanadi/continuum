@@ -1,0 +1,33 @@
+<title>Terminal</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+html,body{margin:0;height:100%;background:#0b111c}
+.win{position:absolute;inset:34px 48px 70px;background:#0f1726;border:1px solid #26334a;border-radius:14px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.5);display:flex;flex-direction:column}
+.bar{height:34px;background:#152033;display:flex;align-items:center;gap:8px;padding:0 14px;border-bottom:1px solid #26334a;font:13px "JetBrains Mono",monospace;color:#9aa5b5}
+.dot{width:12px;height:12px;border-radius:50%}.bar span.t{margin-left:12px}
+pre{margin:0;padding:18px 22px;flex:1;font:15px/1.5 "JetBrains Mono",ui-monospace,Menlo,monospace;color:#d7dde7;white-space:pre-wrap;overflow:hidden}
+.p{color:#e0a24b}.c{color:#ffffff}.b{color:#e0a24b}.ok{color:#7fd3a0}.dim{color:#8391a6}
+</style>
+<div class="win"><div class="bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="t">continuum — zsh — RawTree (live) · fictional Acme pricing</span></div><pre id="out"></pre></div>
+<script>
+const steps=[{"cmd":"npm run -s demo:rawtree -- acme-demo-9989 | grep -A3 nextTask","ms":5098,"output":"  \"nextTask\": {\n    \"id\": \"0:skeptic\",\n    \"role\": \"skeptic\",\n    \"claimKey\": \"acme:pricing\","},{"cmd":"npm run -s demo:rawtree -- acme-demo-9989 | grep -A3 nextTask","ms":5079,"output":"  \"nextTask\": {\n    \"id\": \"0:verifier\",\n    \"role\": \"verifier\",\n    \"claimKey\": \"acme:pricing\","},{"cmd":"npm run -s demo:rawtree -- acme-demo-9989 | grep -A3 nextTask","ms":4982,"output":"  \"nextTask\": null\n}"},{"cmd":"npm run -s demo:rawtree -- acme-demo-9989 replay | tail -17 | cut -c1-118","ms":1229,"output":"Timeline (flight event order; checkpoints anchored to task completions, else by timestamp)\n  2026-09-25 23:46:30.365000000 CKPT revision 1: run created: Investigate fictional Acme pricing; task 0:researcher cr\n  2026-09-25 23:46:31.746000000 S1   0:researcher task started\n  2026-09-25 23:46:32.958000000 CKPT revision 2: task 0:researcher completed; evidence acme:pricing:support = \"$49/mon\n  2026-09-25 23:46:33.724000000 S1   0:researcher task completed\n  ── restart boundary: new process session ──\n  2026-09-25 23:46:35.748000000 S2   run resumed with 2 pending task(s)\n  2026-09-25 23:46:37.103000000 S2   0:skeptic task started\n  2026-09-25 23:46:37.608000000 CKPT revision 3: task 0:skeptic completed; evidence acme:pricing:challenge = \"$79/mont\n  2026-09-25 23:46:38.340000000 S2   0:skeptic task completed\n  ── restart boundary: new process session ──\n  2026-09-25 23:46:40.850000000 S3   run resumed with 1 pending task(s)\n  2026-09-25 23:46:42.109000000 S3   0:verifier task started\n  2026-09-25 23:46:43.017000000 CKPT revision 4: task 0:verifier completed; decision acme:pricing → unresolved; contra\n  2026-09-25 23:46:44.328000000 S3   0:verifier task completed"}];
+const out=document.getElementById("out");
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function line(html){out.insertAdjacentHTML("beforeend",html);out.scrollTop=out.scrollHeight;}
+const escH=v=>v.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"})[c]);
+const cue=[1.2,9.0,15.6,22.2];
+window.__play=async function(){
+  const t0=performance.now();
+  for(let i=0;i<steps.length;i++){
+    const s=steps[i]; const wait=cue[i]*1000-(performance.now()-t0); if(wait>0) await sleep(wait);
+    line("<span class=p>❯ </span>"); for(const ch of s.cmd){ line("<span class=c>"+escH(ch)+"</span>"); await sleep(18); }
+    line("\n"); const spin=document.createElement("span"); spin.className="dim"; out.appendChild(spin);
+    const frames=["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧","⠇","⠏"]; const st=performance.now(); let k=0;
+    while(performance.now()-st<s.ms){ spin.textContent=frames[k++%frames.length]+" running ("+((performance.now()-st)/1000).toFixed(1)+" s)"; await sleep(80); }
+    spin.remove();
+    for(const l of s.output.split("\n")){ const cls=/restart boundary/.test(l)?"b":/unresolved|nextTask": null/.test(l)?"ok":""; line((cls?"<span class="+cls+">":"")+escH(l)+(cls?"</span>":"")+"\n"); await sleep(28); }
+    line("\n");
+  }
+  window.__done=true;
+};
+</script>

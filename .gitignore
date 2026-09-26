@@ -14,3 +14,9 @@ tools/demo-video/video-only.mp4
 tools/demo-video/render
 tools/demo-video/chrome-profile/
 tools/demo-video/
+tools/demo-live/*.aiff
+tools/demo-live/frames/
+tools/demo-live/recording.json
+tools/demo-live/demo-video-only.mp4
+tools/demo-live/assemble
+tools/demo-live/chrome-profile/

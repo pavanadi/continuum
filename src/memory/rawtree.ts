@@ -93,7 +93,12 @@ export class RawTreeMemory {
   async load(): Promise<State | null> {
     if (this.uncertain) throw new Error('Previous write outcome uncertain; inspect RawTree before restarting');
     this.tableKnown = this.tableKnown || await this.transport.hasTable(this.table);
-    const checkpoint = this.tableKnown ? await this.latest() : null;
+    let checkpoint = this.tableKnown ? await this.latest() : null;
+    // Reads can briefly lag a confirmed write. Re-reading is safe (writes are never retried); give up if it persists.
+    for (let attempt = 1; this.loaded && (checkpoint?.revision ?? 0) < this.revision && attempt <= 5; attempt++) {
+      await new Promise(resolve => setTimeout(resolve, 100 * 2 ** attempt));
+      checkpoint = await this.latest();
+    }
     if (this.loaded && (checkpoint?.revision ?? 0) < this.revision) throw new Error('RawTree returned stale state');
     this.previous = checkpoint ? JSON.parse(checkpoint.state_json) : null;
     this.revision = checkpoint?.revision ?? 0;

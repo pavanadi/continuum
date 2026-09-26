@@ -1,0 +1,18 @@
+[
+  { "id": "intro", "caption": "Continuum · live demo",
+    "text": "Hi! This is Continuum. [[slnc 300]] It's a research agent built for long jobs. It remembers its work, survives restarts, and won't tell you anything its memory can't back up. [[slnc 300]] Let me show you, live." },
+  { "id": "terminal", "caption": "Restart survival · three separate processes · fictional example data",
+    "text": "First, restarts. [[slnc 250]] I start a small research run. This one uses made-up pricing data, so it's quick. [[slnc 400]] It does one step, saves it to RawTree, and the process exits. [[slnc 1400]] Now a brand-new process. [[slnc 300]] It picks up exactly where the last one stopped. [[slnc 1800]] And one more, to finish. [[slnc 1800]] The replay shows every restart boundary, and the final decision. The two prices disagree, so it keeps both, instead of guessing." },
+  { "id": "overview", "caption": "Live run · real web data · stored in RawTree",
+    "text": "Now the real thing. [[slnc 300]] We asked Continuum: which small, open model should we run on our own devices? [[slnc 300]] Five models, four facts each, researched live on the web. [[slnc 300]] Green means two different websites agree. Grey means there's only one source, or none, and the agent says so." },
+  { "id": "evidence", "caption": "Every verdict links to exact quotes",
+    "text": "Let's open one. [[slnc 300]] L F M 2 point 5's context length: 128 K. [[slnc 250]] Here are the exact sentences, and where they came from. Some from search snippets, some from full pages the agent went and fetched." },
+  { "id": "contradictions", "caption": "Contradictions stay visible · follow-ups run automatically",
+    "text": "Gemma is more interesting. [[slnc 300]] Hugging Face says 128 K. A listing site says 32,000. [[slnc 300]] Continuum doesn't pick a winner. It ran a follow-up search on its own, couldn't settle it, and kept both. [[slnc 700]] And Qwen? [[slnc 250]] The follow-up found a source that explains both numbers: 32,768 native, and 131,072 with yarn. So it's marked qualified, and the older decision is still right there, in the history. Nothing gets overwritten." },
+  { "id": "ask1", "caption": "Ask the memory · local Liquid LFM2.5 · answered live",
+    "text": "Now, let's ask it why. [[slnc 300]] The question goes to the Liquid model running on this laptop. [[slnc 400]] And before any answer is shown, code checks every citation, number, and source against memory. [[slnc 600]] Verified. With the quotes, right there." },
+  { "id": "ask2", "caption": "Ask the memory · a wrong answer, caught",
+    "text": "Here's a harder one. What failed during this run? [[slnc 1800]] The model writes a fluent, confident answer. [[slnc 300]] And it's withheld. [[slnc 300]] It blamed Gemma for failures that actually belonged to Phi 4 mini. The check caught it, and shows you the real records instead. [[slnc 300]] That's the difference between an agent that sounds right, and one you can audit." },
+  { "id": "brief", "caption": "Evidence brief · data from RawTree · artwork by FLUX",
+    "text": "Finally, the deliverable. An evidence brief, built entirely from what's stored in RawTree. [[slnc 300]] FLUX made the artwork, and it's labeled as art. It never touches the data. [[slnc 500]] That's Continuum. Most agents remember the conversation. [[slnc 300]] Continuum remembers the work." }
+]
